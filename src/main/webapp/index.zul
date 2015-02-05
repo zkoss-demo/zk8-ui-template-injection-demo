@@ -1,0 +1,107 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<?link rel="stylesheet" type="text/css" href="/css/datalist.css.dsp"?>
+<?script src="http://cdn.jsdelivr.net/jquery.mixitup/latest/jquery.mixitup.js"?>
+<zk xmlns:n="native" xmlns:x="xhtml">
+	<div viewModel="@id('vm') @init('org.zkoss.blog.example.zuti.DataListViewModel')">
+		<n:header>
+			<n:div sclass="center-block">
+				<n:div sclass="header pull-left">
+					<n:i sclass="z-icon-spinner"></n:i>
+					<label sclass="header-info" value="@load(c:cat3('In Progress (', vm.dataList.size(), ')'))" />
+					<n:i sclass="z-icon-search"></n:i>
+					<textbox sclass="z-icon- search" width="300px" zclass="none" placeholder="Search" onChanging="@command('filter',query=event.value)" />
+				</n:div>
+				<n:div sclass="toolbar pull-right">
+					<hlayout>
+						<a iconSclass="z-icon-th-large" sclass="@load(vm.mode eq 'grid' ? 'active' : '')" onClick="@command('changeMode', mode='grid')"/>
+						<a iconSclass="z-icon-th-list" sclass="@load(vm.mode eq 'list' ? 'active' : '')" onClick="@command('changeMode', mode='list')"/>
+						<a iconSclass="z-icon-indent" sclass="@load(vm.mode eq 'tree' ? 'active' : '')" onClick="@command('changeMode', mode='tree')"/>
+					</hlayout>
+				</n:div>
+			</n:div>
+		</n:header>
+		<div sclass="data-container">
+			<choose>
+				<when test="@load(vm.mode ne 'tree')">
+					<forEach items="@load(vm.dataList)">
+						<apply template="@load(vm.mode)" item="@ref(each)"/>
+					</forEach>
+				</when>
+				<otherwise>
+					<apply template="@load(vm.mode)" item="@ref(each)"/>
+				</otherwise>
+			</choose>
+		</div>
+		<template name="grid" src="/templates/dataList_grid.zhtml"/>
+		<template name="list">
+			<div sclass="item-list mix">
+					<n:span sclass="item-thumb">
+					<image sclass="item-icon" src="@load(c:cat3('/image/Centigrade-Widget-Icons/' , each.name , '-128x128.png'))" />
+					</n:span>
+					<n:span sclass="item-info">
+						<label sclass="item-name" value="@load(each.name)" />
+					</n:span>
+					<span style="text-align: left" sclass="pull-right">
+						<image
+							sclass="@load(c:cat('author-icon ', c:toLowerCase(each.author.name)))" />
+						<label value="@load(each.author.name)"
+							sclass="author-name" />
+					</span>
+			</div>
+		</template>
+		<template name="tree">
+				<forEach items="@load(vm.authors)" var="author">
+					<n:div sclass="mix" style="display:block">
+						<span sclass="author-outline">
+							<image
+								sclass="@load(c:cat('author-icon ', c:toLowerCase(author.name)))" />
+						</span>
+						<label value="@load(author.name)"
+							sclass="author-name" />
+						<n:div sclass="item-tree-items">
+							<n:div sclass="author-connector pull-left"/>
+							<forEach items="@load(vm.dataList)" var="item">
+								<if test="@load(item.author.name eq author.name)">
+									<n:div sclass="pull-left">
+										<n:span sclass="item-thumb">
+											<image sclass="item-icon" src="@load(c:cat3('/image/Centigrade-Widget-Icons/' , item.name , '-128x128.png'))" />
+										</n:span>
+										<n:span sclass="item-info">
+											<label sclass="item-name" value="@load(item.name)" />
+										</n:span>
+									</n:div>
+								</if>
+							</forEach>
+						</n:div>
+					</n:div>
+				</forEach>
+				<if test="@load(not empty vm.authors)">
+					<span sclass="author-outline author-empty"></span>
+				</if>
+		</template>
+	</div>
+	<script><![CDATA[
+	zk.afterMount(function(){
+
+	// Instantiate MixItUp:
+	$('.data-container').mixItUp({layout:{display: 'block'}});
+	
+	// get the current widget from the given selector.
+	var wgt = zk.Widget.$('.data-container');
+	
+	// get the current binder
+	var binder = wgt.$binder();
+
+	// define the animation function
+	var anima = function () {
+		if (wgt.firstChild && jq(wgt.firstChild).hasClass('mix')) {
+			$('.data-container').data('mixItUp').sort('random');
+		}
+	};
+	anima();
+	
+	// do the animation function after both commands 'changeMode' and 'filter'
+	binder.after('changeMode', anima).after('filter', anima);
+});
+	]]></script>
+</zk>

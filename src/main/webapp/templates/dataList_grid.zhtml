@@ -1,0 +1,15 @@
+<div sclass="item mix" xmlns:n="native">
+	<img sclass="center-block"
+		src="@load(c:cat3('/image/Centigrade-Widget-Icons/' , each.name , '-128x128.png'))" />
+	<n:div sclass="item-info">
+		<n:div>
+			<label sclass="item-name center-block" textContent="@load(each.name)" />
+			<n:span style="text-align: left" sclass="pull-left">
+				<img sclass="@load(c:cat('author-icon ', c:toLowerCase(each.author.name)))"
+					src="~./img/spacer.gif" />
+				<label textContent="@load(each.author.name)"
+					sclass="author-name z-label" />
+			</n:span>
+		</n:div>
+	</n:div>
+</div>
